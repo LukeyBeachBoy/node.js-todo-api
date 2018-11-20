@@ -39,7 +39,6 @@ app.post('/users', (req, res) => {
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
         res.send({todos});
-        console.log(req.route);
     }, (e) => {
         res.status(400).send(e);
     });

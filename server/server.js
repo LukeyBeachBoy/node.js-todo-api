@@ -72,7 +72,7 @@ app.get("/todos/:id", (req, res) => {
       res.status(200).send({ todo });
     })
     .catch(e => {
-      res.status(400).send();
+      res.status(400).send({message:"cunt"});
     });
 });
 

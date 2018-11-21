@@ -10,7 +10,6 @@ const { User } = require("./models/user");
 var app = express();
 const port = process.env.PORT || 3000;
 
-
 app.use(bodyParser.json());
 /* 
 The bodyParser.json() middleware we are 
@@ -62,13 +61,13 @@ app.get("/todos", (req, res) => {
 app.get("/todos/:id", (req, res) => {
   var id = req.params.id; //gives us the value of id
   if (!ObjectID.isValid(id)) {
-    return res.status(400).send({message: "That's not an ObjectID, silly."});
+    return res.status(400).send({ message: "That's not an ObjectID, silly." });
   }
 
   Todo.findById(id)
     .then(todo => {
       if (!todo) {
-        return res.status(404).send({message:"No note exists with that id"});
+        return res.status(404).send({ message: "No note exists with that id" });
       }
       res.status(200).send({ todo });
     })
@@ -76,6 +75,21 @@ app.get("/todos/:id", (req, res) => {
       res.status(400).send();
     });
 });
+
+app.delete("/todos/:id", (req, res) => {
+    let id = req.params.id;
+    if (!ObjectID.isValid(id))
+      return res.status(400).send("Not a valid object id");
+
+    Todo.findByIdAndRemove(id)
+    .then(todo => {
+      if (!todo) return res.status(404).send("No note found with that id");
+      res.status(200).send({noteDeleted: todo});
+    }).catch(err => {
+      res.status(400).send("Something went wrong with your request");
+    });
+  });
+  
 
 app.listen(port, () => {
   console.log(`Started on port: ${port}`);

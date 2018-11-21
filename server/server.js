@@ -10,6 +10,7 @@ const { User } = require("./models/user");
 var app = express();
 const port = process.env.PORT || 3000;
 
+
 app.use(bodyParser.json());
 /* 
 The bodyParser.json() middleware we are 
@@ -52,7 +53,7 @@ app.get("/todos", (req, res) => {
       res.send({ todos });
     },
     e => {
-      res.status(400).send(e);
+      res.status(400).send("test");
     }
   );
 });
@@ -61,13 +62,13 @@ app.get("/todos", (req, res) => {
 app.get("/todos/:id", (req, res) => {
   var id = req.params.id; //gives us the value of id
   if (!ObjectID.isValid(id)) {
-    return res.status(400).send();
+    return res.status(400).send({message: "That's not an ObjectID, silly."});
   }
 
   Todo.findById(id)
     .then(todo => {
       if (!todo) {
-        return res.status(404).send({message:"cunt"});
+        return res.status(404).send({message:"No note exists with that id"});
       }
       res.status(200).send({ todo });
     })

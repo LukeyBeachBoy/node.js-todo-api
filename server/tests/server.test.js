@@ -1,6 +1,7 @@
 const request = require("supertest");
 const expect = require("expect");
 const { ObjectID } = require("mongodb");
+const Type = require("type-of-is");
 
 const { app } = require("./../server");
 const { Todo } = require("./../models/todo");
@@ -12,7 +13,9 @@ const todos = [
   },
   {
     _id: new ObjectID(),
-    text: "Second test todo"
+    text: "Second test todo",
+    completed: true,
+    completedAt: 333
   }
 ];
 
@@ -152,14 +155,41 @@ describe("DELETE /todos/:id", () => {
       })
       .end(done);
   });
+  it("should return 400 if ObjectID is invalid", done => {
+    request(app)
+      .delete("/todos/123")
+      .expect(400)
+      .expect(res => {
+        expect(res.body.todo).toBeUndefined();
+      })
+      .end(done);
+  });
 });
 
-it("should return 400 if ObjectID is invalid", done => {
-  request(app)
-    .delete("/todos/123")
-    .expect(400)
-    .expect(res => {
-      expect(res.body.todo).toBeUndefined();
-    })
-    .end(done);
+describe("PATCH /todos/:id", () => {
+  it("should update the todo", done => {
+    let id = todos[0]._id.toHexString();
+    request(app)
+      .patch(`/todos/${id}`)
+      .send({ text: "This is the new text", completed: true })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe("This is the new text");
+        expect(res.body.todo.completed).toBeTruthy();
+        expect(Type(res.body.todo.completedAt, Number)).toBeTruthy();
+      })
+      .end(e => done(e));
+  });
+  it("should clear completedAt when todo is not completed", done => {
+    let id = todos[1]._id.toHexString();
+    request(app)
+    .patch(`/todos/${id}`)
+    .send({ text: "This is some new text", completed : false})
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.todo.text).toBe('This is some new text');
+      expect(res.body.todo.completed).toBe(false);
+      expect(Type(res.body.todo.completedAt, Number)).toBe(false);
+    }).end(done);
+  });
 });

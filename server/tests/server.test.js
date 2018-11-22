@@ -154,12 +154,12 @@ describe("DELETE /todos/:id", () => {
   });
 });
 
-it('should return 400 if ObjectID is invalid', (done) => {
+it("should return 400 if ObjectID is invalid", done => {
   request(app)
-  .delete("/todos/123")
-  .expect(400)
-  .expect(res => {
-    expect(res.body.todo).toBeUndefined();
-  })
-  .end(done);
+    .delete("/todos/123")
+    .expect(400)
+    .expect(res => {
+      expect(res.body.todo).toBeUndefined();
+    })
+    .end(done);
 });

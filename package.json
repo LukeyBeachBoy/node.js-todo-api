@@ -16,11 +16,15 @@
   "dependencies": {
     "@types/mongodb": "^3.1.14",
     "body-parser": "^1.18.3",
+    "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.10",
     "mongoose": "^5.3.12",
-    "type-of-is": "^3.5.1"
+    "mongoose-unique-validator": "^2.0.2",
+    "type-of-is": "^3.5.1",
+    "validator": "^10.10.0"
   },
   "devDependencies": {
     "@types/expect.js": "^0.3.29",

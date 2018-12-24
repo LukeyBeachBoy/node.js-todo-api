@@ -8,13 +8,14 @@ const { ObjectID } = require('mongodb');
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
+const { authenticate } = require('./middleware/authenticate');
 
-var app = express();
+const app = express();
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
-/* 
-The bodyParser.json() middleware we are 
+/*
+The bodyParser.json() middleware we are
 using stores the posted data, parsed as an object
 in the request variable
 */
@@ -110,7 +111,6 @@ app.patch('/todos/:id', (req, res) => {
 app.post('/users', (req, res) => {
   let body = _.pick(req.body, ['email', 'password']);
   var user = new User(body);
-
   user
     .save()
     .then(() => {
@@ -132,6 +132,10 @@ app.post('/users', (req, res) => {
         res.status(400).send(error);
       }
     });
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 app.get('/users', (req, res) => {

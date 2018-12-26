@@ -5,13 +5,13 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
     trim: true,
     minLength: 1,
-    unique: true, //can't have two docs in database with same email
+    unique: true, // can't have two docs in database with same email
     validate: {
       validator: validator.isEmail,
       message: '{VALUE} is not a valid email'
@@ -40,27 +40,25 @@ UserSchema.plugin(uniqueValidator, {
   message: 'This email is already registered with a user, please try another.'
 });
 
-UserSchema.methods.toJSON = function() {
-  var user = this;
-  var userObject = user.toObject();
+UserSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
   return _.pick(userObject, ['_id', 'email']);
 };
 
-UserSchema.methods.generateAuthToken = function() {
-  var user = this;
-  var access = 'auth';
-  var token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
+UserSchema.methods.generateAuthToken = function () {
+  const user = this;
+  const access = 'auth';
+  const token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
 
   user.tokens = user.tokens.concat({ access, token });
 
-  return user.save().then(() => {
-    return token;
-  });
+  return user.save().then(() => token);
 };
 
-UserSchema.statics.findByToken = function(token) {
-  var User = this;
-  var decoded;
+UserSchema.statics.findByToken = function (token) {
+  const User = this;
+  let decoded;
   try {
     decoded = jwt.verify(token, 'abc123');
   } catch (error) {
@@ -73,12 +71,12 @@ UserSchema.statics.findByToken = function(token) {
   });
 };
 
-UserSchema.pre('save', function(next) {
-  var user = this;
+UserSchema.pre('save', function (next) {
+  const user = this;
 
   if (user.isModified('password')) {
     bcrypt.genSalt(undefined, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
+      bcrypt.hash(user.password, salt, (e, hash) => {
         user.password = hash;
         next();
       });
@@ -88,6 +86,6 @@ UserSchema.pre('save', function(next) {
   }
 });
 
-var User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 module.exports = { User };

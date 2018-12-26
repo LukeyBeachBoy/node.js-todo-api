@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
 
+// eslint-disable-next-line no-unused-vars
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
@@ -14,6 +15,7 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
+
 /*
 The bodyParser.json() middleware we are
 using stores the posted data, parsed as an object
@@ -23,15 +25,15 @@ in the request variable
 // TODOS
 
 app.post('/todos', (req, res) => {
-  var todo = new Todo({
+  const todo = new Todo({
     text: req.body.text
   });
 
   todo.save().then(
-    doc => {
+    (doc) => {
       res.send(doc);
     },
-    e => {
+    (e) => {
       res.status(400).send(e);
     }
   );
@@ -39,51 +41,51 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
   Todo.find().then(
-    todos => {
+    (todos) => {
       res.send({ todos });
     },
-    e => {
+    (e) => {
       res.status(400).send('test');
     }
   );
 });
 
-//:id = url param key which is stored in the params object
+// :id = url param key which is stored in the params object
 app.get('/todos/:id', (req, res) => {
-  var id = req.params.id; //gives us the value of id
+  const id = req.params.id; // gives us the value of id
   if (!ObjectID.isValid(id)) {
     return res.status(400).send({ message: "That's not an ObjectID, silly." });
   }
 
   Todo.findById(id)
-    .then(todo => {
+    .then((todo) => {
       if (!todo) {
         return res.status(404).send({ message: 'No note exists with that id' });
       }
       res.status(200).send({ todo });
     })
-    .catch(e => {
+    .catch((e) => {
       res.status(400).send();
     });
 });
 
 app.delete('/todos/:id', (req, res) => {
-  var id = req.params.id;
+  const id = req.params.id;
   if (!ObjectID.isValid(id)) return res.status(400).send('Not a valid object id');
 
   Todo.findByIdAndRemove(id)
-    .then(todo => {
+    .then((todo) => {
       if (!todo) return res.status(404).send('No note found with that id');
       res.status(200).send({ todo });
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(400).send('Something went wrong with your request');
     });
 });
 
 app.patch('/todos/:id', (req, res) => {
-  var id = req.params.id;
-  var body = _.pick(req.body, ['text', 'completed']);
+  const id = req.params.id;
+  const body = _.pick(req.body, ['text', 'completed']);
 
   if (!ObjectID.isValid(id)) return res.status(400).send('Not a valid object id');
 
@@ -95,13 +97,13 @@ app.patch('/todos/:id', (req, res) => {
   }
 
   Todo.findByIdAndUpdate(id, { $set: body }, { new: true })
-    .then(todo => {
+    .then((todo) => {
       if (!todo) {
         return res.status(400).send();
       }
       res.send({ todo });
     })
-    .catch(e => {
+    .catch((e) => {
       res.status(400).send();
     });
 });
@@ -109,23 +111,21 @@ app.patch('/todos/:id', (req, res) => {
 // USERS
 
 app.post('/users', (req, res) => {
-  let body = _.pick(req.body, ['email', 'password']);
-  var user = new User(body);
+  const body = _.pick(req.body, ['email', 'password']);
+  const user = new User(body);
   user
     .save()
-    .then(() => {
-      return user.generateAuthToken();
-    })
-    .then(token => {
+    .then(() => user.generateAuthToken())
+    .then((token) => {
       res.header('x-auth', token).send(user);
     })
-    .catch(error => {
+    .catch((error) => {
       if (error.errors) {
         if (error.errors.email) {
-          let errorMessage = error.errors.email.message.toString();
+          const errorMessage = error.errors.email.message.toString();
           res.status(400).send(errorMessage);
         } else if (error.errors.password) {
-          let errorMessage = error.errors.password.message.toString();
+          const errorMessage = error.errors.password.message.toString();
           res.status(400).send(errorMessage);
         }
       } else {
@@ -140,10 +140,10 @@ app.get('/users/me', authenticate, (req, res) => {
 
 app.get('/users', (req, res) => {
   User.find()
-    .then(users => {
+    .then((users) => {
       res.send(users);
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
     });
 });
